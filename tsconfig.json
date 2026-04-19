@@ -1,0 +1,21 @@
+{
+	"compilerOptions": {
+		"rootDir": "src",
+		"moduleResolution": "bundler",
+		"module": "esnext",
+		"target": "es6",
+		"esModuleInterop": true,
+		"allowSyntheticDefaultImports": true,
+		"strict": true,
+		"skipLibCheck": true,
+		"outDir": "dist",
+		"incremental": false,
+		"typeRoots": ["./node_modules/@types", "./src/types"],
+		"types": ["node"],
+		"experimentalDecorators": true,
+		"emitDecoratorMetadata": true,
+		"declaration": true
+	},
+	"include": ["src/**/*"],
+	"exclude": ["node_modules", "dist", "src/test"]
+}
