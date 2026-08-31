@@ -12,6 +12,24 @@
 	"author": "Tobias Sjöblom",
 	"license": "Pirate",
 	"description": "A lightweight TypeScript framework for building structured Express applications with decorator-based routing and automatic route loading.",
+	"keywords": [
+		"express",
+		"typescript",
+		"framework",
+		"decorators",
+		"routing",
+		"rest",
+		"api",
+		"server"
+	],
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/sjoblomtobias/relay.git"
+	},
+	"homepage": "https://github.com/sjoblomtobias/relay#readme",
+	"bugs": {
+		"url": "https://github.com/sjoblomtobias/relay/issues"
+	},
 	"dependencies": {
 		"express": "^5.1.0"
 	},

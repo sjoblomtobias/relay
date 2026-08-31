@@ -1,49 +1,51 @@
-import fs from "fs";
-import path from "path";
 import express from "express";
-import type { RequestHandler } from "express";
+import type { Route } from "./route.js";
+import type { ErrorRequestHandler, RequestHandler } from "express";
+
+export type RouteConstructor = new (authMiddleware?: RequestHandler) => Route;
 
 export class Server {
 	private port: number;
-	private routesDirectory: string;
 	private app: express.Express;
 	private authMiddleware?: RequestHandler;
 
 	/**
 	 * Creates an instance of the Server class.
 	 * @param port The port number on which the server will listen.
-	 * @param routesDirectory The directory where route files are located.
 	 * @param authMiddleware Optional authentication middleware to be used for private routes.
 	 */
-	constructor(port: number, routesDirectory: string, authMiddleware?: RequestHandler) {
+	constructor(port: number, authMiddleware?: RequestHandler) {
 		this.port = port;
-		this.routesDirectory = routesDirectory;
 		this.app = express();
+		this.app.disable("x-powered-by");
 		this.authMiddleware = authMiddleware;
 	}
 
 	/**
-	 * Loads all routes from the specified directory.
-	 * @param baseDir The base directory to resolve the routes directory from. Defaults to process.cwd().
-	 * @returns Promise that resolves when all routes are loaded.
+	 * Default error handler. Returns a generic 500 response, only including
+	 * the error message and stack trace when NODE_ENV is "development".
 	 */
-	public async loadRoutes(baseDir: string = process.cwd()): Promise<void> {
-		const routes = path.join(baseDir, this.routesDirectory);
-		if (!fs.existsSync(routes)) {
-			throw new Error(`Routes directory "${routes}" does not exist.`);
+	private readonly errorHandler: ErrorRequestHandler = (err, req, res, next) => {
+		if (res.headersSent) {
+			next(err);
+			return;
 		}
-		const files = fs.readdirSync(routes);
-		await Promise.all(
-			files.map(async (file) => {
-				const modulePath = path.join(routes, file);
-				const module = await import(modulePath);
-				const RouteClass = module.default;
+		const isDevelopment = process.env.NODE_ENV === "development";
+		res.status(500).json({
+			error: "Internal Server Error",
+			...(isDevelopment && { message: err instanceof Error ? err.message : String(err), stack: err instanceof Error ? err.stack : undefined })
+		});
+	};
 
-				// Pass authMiddleware to Route constructor
-				const routeInstance = new RouteClass(this.authMiddleware);
-				this.app.use(routeInstance.router);
-			})
-		);
+	/**
+	 * Registers one or more route classes with the server.
+	 * @param routeClasses - Route classes decorated with @Public or @Private.
+	 */
+	public registerRoutes(...routeClasses: Array<RouteConstructor>): void {
+		routeClasses.forEach((RouteClass) => {
+			const routeInstance = new RouteClass(this.authMiddleware);
+			this.app.use(routeInstance.router);
+		});
 	}
 
 	/**
@@ -71,6 +73,7 @@ export class Server {
 		if (before) {
 			await before();
 		}
+		this.app.use(this.errorHandler);
 		await new Promise<void>((resolve) => {
 			this.app.listen(this.port, () => {
 				resolve();

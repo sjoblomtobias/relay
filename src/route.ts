@@ -61,14 +61,12 @@ export abstract class Route {
 	 * Initializes the routes based on the implemented methods in the subclass.
 	 */
 	protected initializeRoutes() {
+		if (this.isPrivate && !this.authMiddleware) {
+			throw new Error(`Route "${this.location}" is marked private but no authMiddleware was provided. Refusing to register it unprotected.`);
+		}
 		this.getEndpoints().forEach(({ path, handler, routerMethod }) => {
 			if (typeof handler === "function") {
-				let handlers;
-				if (this.isPrivate && this.authMiddleware) {
-					handlers = [this.authMiddleware, handler.bind(this)];
-				} else {
-					handlers = [handler.bind(this)];
-				}
+				const handlers = this.isPrivate && this.authMiddleware ? [this.authMiddleware, handler.bind(this)] : [handler.bind(this)];
 				const fullPath = path ? `${this.location}${path}` : `${this.location}`;
 				routerMethod(fullPath, ...handlers);
 			}
