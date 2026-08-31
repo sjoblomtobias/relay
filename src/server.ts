@@ -2,7 +2,8 @@ import express from "express";
 import type { Route } from "./route.js";
 import type { ErrorRequestHandler, RequestHandler } from "express";
 
-export type RouteConstructor = new (authMiddleware?: RequestHandler) => Route;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export type RouteConstructor = new (...args: any[]) => Route;
 
 export class Server {
 	private port: number;

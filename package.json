@@ -1,17 +1,19 @@
 {
 	"name": "@sjoblomtobias/relay",
-	"version": "2.0.0",
+	"version": "2.0.1",
 	"type": "module",
 	"main": "dist/index.js",
 	"scripts": {
 		"build": "tsc",
 		"dev": "tsx --watch test/index.ts",
 		"lint": "eslint src",
-		"format": "prettier --write src"
+		"format": "prettier --write src",
+		"typecheck:test": "tsc -p tsconfig.test.json",
+		"prepublishOnly": "npm run build && npm run lint && npm run typecheck:test"
 	},
 	"author": "Tobias Sjöblom",
 	"license": "Pirate",
-	"description": "A lightweight TypeScript framework for building structured Express applications with decorator-based routing and automatic route loading.",
+	"description": "A lightweight TypeScript framework for building structured Express applications with decorator-based routing.",
 	"keywords": [
 		"express",
 		"typescript",
