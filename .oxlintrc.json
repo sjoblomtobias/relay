@@ -1,0 +1,33 @@
+{
+	"$schema": "./node_modules/oxlint/configuration_schema.json",
+	"plugins": ["typescript", "unicorn", "oxc", "import"],
+	"categories": {
+		"correctness": "error"
+	},
+	"env": {
+		"builtin": true
+	},
+	"settings": {
+		"import": {
+			"alwaysTryTypes": true,
+			"project": "./tsconfig.json"
+		}
+	},
+	"rules": {
+		"typescript/no-explicit-any": "warn",
+		"no-unused-vars": [
+			"error",
+			{
+				"vars": "all",
+				"args": "after-used",
+				"caughtErrors": "all",
+				"argsIgnorePattern": "^_",
+				"caughtErrorsIgnorePattern": "^_",
+				"destructuredArrayIgnorePattern": "^_",
+				"varsIgnorePattern": "^_"
+			}
+		],
+		"typescript/consistent-type-imports": ["error", { "prefer": "type-imports" }],
+		"eqeqeq": ["error", "always"]
+	}
+}
